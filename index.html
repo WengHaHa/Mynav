@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人导航</title>
+    <meta name="description" content="个人定制的导航首页，集成搜索和常用网站">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: #fff;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path fill="rgba(255,255,255,0.05)" d="M0,0 L100,0 L100,100 Z"/></svg>');
+            background-size: cover;
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            z-index: 1;
+        }
+
+        /* 右上角工具栏 */
+        .toolbar {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+        
+        .tool {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.3rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .tool:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo {
+            margin-bottom: 2.5rem;
+            animation: fadeInDown 0.8s ease;
+        }
+        
+        .logo h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #fff, #a8edea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+
+        .search-container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            animation: fadeInUp 0.8s ease 0.2s both;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .search-form {
+            display: flex;
+            max-width: 600px;
+            margin: auto;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .search-engine {
+            width: 120px;
+            border: none;
+            outline: none;
+            background: rgba(255, 255, 255, 0.25);
+            color: #fff;
+            padding: 0 1rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .search-engine option {
+            background: #333;
+        }
+        
+        .search-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+        
+        .search-btn {
+            background: #ff6b6b;
+            color: #fff;
+            border: none;
+            padding: 0 1.8rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .search-btn:hover {
+            background: #ff5252;
+        }
+
+        .links-section {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            animation: fadeInUp 0.8s ease 0.4s both;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .links-section h2 {
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+        
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .link-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem 1rem;
+            text-decoration: none;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .link-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .link-icon {
+            font-size: 2.2rem;
+            margin-bottom: 0.8rem;
+            height: 50px;
+            width: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .footer {
+            margin-top: 2rem;
+            opacity: 0.7;
+            font-size: 0.9rem;
+            animation: fadeIn 1s ease 0.6s both;
+        }
+
+        /* 动画 */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 0.7; }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .search-form {
+                flex-direction: column;
+            }
+            
+            .search-engine {
+                width: 100%;
+                border-radius: 12px 12px 0 0;
+                padding: 1rem;
+            }
+            
+            .search-input {
+                border-radius: 0;
+            }
+            
+            .search-btn {
+                border-radius: 0 0 12px 12px;
+                padding: 1rem;
+            }
+            
+            .links-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+            
+            .toolbar {
+                top: 15px;
+                right: 15px;
+                gap: 8px;
+            }
+            
+            .tool {
+                width: 44px;
+                height: 44px;
+                font-size: 1.2rem;
+            }
+            
+            .logo h1 {
+                font-size: 2.2rem;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .links-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- 工具栏 -->
+<div class="toolbar">
+    <a class="tool" href="https://1lemon.cn/1" target="_blank" title="时间日历">
+        <i class="fas fa-clock"></i>
+    </a>
+    <a class="tool" href="https://1lemon.cn/memos" target="_blank" title="备忘录">
+        <i class="fas fa-sticky-note"></i>
+    </a>
+    <a class="tool" href="https://1lemon.cn/2" target="_blank" title="汽车定位">
+        <i class="fas fa-car"></i>
+    </a>
+    <a class="tool" href="https://list.1lemon.cn" target="_blank" title="网盘入口">
+        <i class="fas fa-cloud"></i>
+    </a>
+</div>
+
+<div class="container">
+    <div class="logo">
+        <h1>个人导航</h1>
+    </div>
+
+    <!-- 搜索 -->
+    <div class="search-container">
+        <form class="search-form" id="searchForm">
+            <select class="search-engine" id="engineSelect">
+                <option value="https://www.google.com/search?q=">谷歌</option>
+                <option value="https://www.baidu.com/s?wd=">百度</option>
+                <option value="https://github.com/search?q=">GitHub</option>
+            </select>
+            <input type="text" class="search-input" id="searchInput" placeholder="输入搜索内容，按回车键搜索..." required autocomplete="off">
+            <button type="submit" class="search-btn">
+                <i class="fas fa-search"></i>
+            </button>
+        </form>
+    </div>
+
+    <div class="links-section">
+        <div class="links-grid">
+            <a href="https://news.1lemon.cn" class="link-item" target="_blank">
+                <i class="fas fa-newspaper link-icon"></i>
+                新闻资讯
+            </a>
+            <a href="http://nav.1lemon.cn" class="link-item" target="_blank">
+                <i class="fas fa-bookmark link-icon"></i>
+                书签收集
+            </a>
+            <a href="https://zh.z-library.sk/" class="link-item" target="_blank">
+                <i class="fas fa-book link-icon"></i>
+                电子图书
+            </a>
+            <a href="https://ipcheck.ing/#/" class="link-item" target="_blank">
+                <i class="fas fa-network-wired link-icon"></i>
+                IP地址
+            </a>
+            <a href="https://it-tools.tech/" class="link-item" target="_blank">
+                <i class="fas fa-tools link-icon"></i>
+                IT-TOOLS
+            </a>
+            <a href="https://draw.1lemon.cn" class="link-item" target="_blank">
+                <i class="fas fa-paint-brush link-icon"></i>
+                绘图工具
+            </a>
+            <a href="https://1lemon.cn" class="link-item" target="_blank">
+                <i class="fas fa-link link-icon"></i>
+                短链生成
+            </a>
+            <a href="https://convert.1lemon.cn" class="link-item" target="_blank">
+                <i class="fas fa-exchange-alt link-icon"></i>
+                文件转换
+            </a>
+        </div>
+    </div>
+
+    <div class="footer">
+        © 2026 个人导航
+    </div>
+</div>
+
+<script>
+    // 搜索功能
+    const searchForm = document.getElementById('searchForm');
+    const engineSelect = document.getElementById('engineSelect');
+    const searchInput = document.getElementById('searchInput');
+    
+    // 搜索提交处理
+    searchForm.addEventListener('submit', e => {
+        e.preventDefault();
+        const query = searchInput.value.trim();
+        if (query) {
+            const url = engineSelect.value + encodeURIComponent(query);
+            window.open(url, '_blank');
+            searchInput.value = ''; // 清空搜索框
+        }
+    });
+    
+    // 搜索框回车键支持
+    searchInput.addEventListener('keypress', e => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            searchForm.dispatchEvent(new Event('submit'));
+        }
+    });
+    
+    // 页面加载后自动聚焦搜索框，并恢复上次的搜索引擎选择
+    window.addEventListener('DOMContentLoaded', () => {
+        searchInput.focus();
+        const savedEngine = localStorage.getItem('searchEngine');
+        if (savedEngine) {
+            engineSelect.value = savedEngine;
+        }
+    });
+    
+    // 保存搜索引擎选择
+    engineSelect.addEventListener('change', () => {
+        localStorage.setItem('searchEngine', engineSelect.value);
+    });
+    
+    // 键盘快捷键：Ctrl+Enter 快速搜索
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && document.activeElement === searchInput) {
+            e.preventDefault();
+            searchForm.dispatchEvent(new Event('submit'));
+        }
+    });
+</script>
+
+</body>
+</html>
